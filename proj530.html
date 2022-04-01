@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>leaflet map</title>
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css" />
+    <style media="screen">
+      #map { height: 600px; }
+
+    </style>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  </head>
+  <body>
+<div class="first">
+  <h1>Leaflet OpenWeatherMap</h1>
+  <h4>by Wendelle So</h4>
+</div>
+<div id="map" class="map"></div>
+<script type="text/javascript">
+  var map = L.map('map', { center: new L.LatLng(43.70011,-79.4163), zoom: 7});
+  var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18, attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a> '}).addTo(map);
+
+
+    cities=[{"city":"Toronto","latitude":43.70011,"longitude":-79.4163},{"city":"Rio de Janeiro","latitude":-22.908333,"longitude":-43.196388},{"city":"Montevideo","latitude":-34.901112,"longitude":-56.164532},{"city":"Berlin","latitude":52.520008,"longitude":13.404954},{"city":"Rome","latitude":41.902782,"longitude":12.496366},{"city":"Cairo","latitude":30.033333,"longitude":31.233334},{"city":"Seoul","latitude":37.532600,"longitude":127.024612},{"city":"Manhattan","latitude":40.782886,"longitude":-73.971104},{"city":"Tokyo","latitude":35.652832,"longitude":139.839478},{"city":"Paris","latitude":48.864716,"longitude":2.349014},{"city":"Shanghai","latitude":31.224361,"longitude":121.469170}];
+  //var popup = L.popup();
+  var marker=cities.forEach(bigcity => {
+    L.marker([bigcity.latitude, bigcity.longitude],{title:bigcity.city}).on('click', onMapClick).addTo(map);
+    })
+    function groupClick(e) {
+   var a = this.options.title;
+   console.log(a);
+   return a;
+}
+
+    var popup = L.popup();
+
+
+
+    //popup function
+    function onMapClick(e) {
+      var city = this.options.title;
+      console.log(city);
+      popup
+          .setLatLng(e.latlng)
+          .setContent() //esample from leaflet, will be immediately replaced by weatherpopup...
+          .openOn(map);
+
+
+
+
+
+
+
+    //getting json function
+    $(document).ready(function(){
+      $.ajax({
+url:"https://api.openweathermap.org/data/2.5/weather?q=" +city+"&units=metric"+ "&appid=88528a0cceed3a093466d497b718e40a",
+        dataType: 'json',
+        success: function(data) {
+          longitude=data.coord.lon;
+          latitude=data.coord.lat;
+          atmpressure=data.main.pressure;
+          temperature = data.main.temp;
+          feelslike=data.main.feels_like;
+          humidity=data.main.humidity;
+          mintemps=data.main.temp_min;
+          maxtemps=data.main.temp_max;
+          seapressure=data.main.sea_level;
+          groundpressure=data.main.grnd_level;
+          windspeed=data.wind.speed;
+          cloudiness=data.clouds.all;
+          weatherdescription=data.weather[0].description;
+          icon="http://openweathermap.org/img/w/"+data.weather[0].icon+".png";
+          popup.setContent("<img src="+icon+"><br>"+"<br>city   "+city+"<br>weather description    "+weatherdescription+"<br>temperature   "+temperature+"Celsius"+"<br>feels like    "+feelslike+"Celsius"+"<br>maxtemps   "+maxtemps+"Celsius"+"<br>mintemps   "+mintemps+"Celsius"+"<br>humidity   "+humidity+"%"+"<br>atm. pressure   "+atmpressure+"hPa"+"<br>cloudiness   "+cloudiness+"%"+"<br> sea pressure"+seapressure +"hPa"+ "<br> ground pressure    "+groundpressure+"hPa"+"<br> windspeed    "+windspeed+"m/s"+"<br> longitude   "+longitude+"<br> latitude    "+latitude);
+
+
+
+
+
+    //Popup with content
+    //var fontsizesmall = 1;
+// popup.setContent("temperature  "+temperature);
+
+
+        },
+        error: function() {
+          alert("error receiving wind data from openweathermap");
+        }
+      });
+    });
+    //getting json function ends here
+
+    //popupfunction ends here
+    }
+  //var marker=cities.forEach(bigcity => {
+  //  L.marker([bigcity.latitude, bigcity.longitude]).on('click',onMapClick).bindPopup(bigcity.city).openPopup().addTo(map);
+  //  })
+    //popup
+</script>
+  </body>
+</html>
